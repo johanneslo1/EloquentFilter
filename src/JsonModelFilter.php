@@ -36,7 +36,11 @@ class JsonModelFilter extends ModelFilter
         $filters = json_decode($json);
 
         foreach ($filters as $key => $value) {
-            $this->{array_search($key, $this->filterKeyMapping)}($value);
+            $methodName = array_search($key, $this->filterMapping);
+
+            if(method_exists($this, $methodName)) {
+                $this->{$methodName}($value);
+            }
         }
     }
 }
