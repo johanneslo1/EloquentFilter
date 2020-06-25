@@ -23,7 +23,7 @@ class JsonModelFilter extends ModelFilter
      *  'status' => 'filterStatus',
      * ]
      */
-    public $filterKeyMapping = [];
+    public $filterMapping = [];
 
 
     /**
