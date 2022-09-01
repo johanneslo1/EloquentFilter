@@ -5,7 +5,6 @@
 [![Daily Downloads](https://poser.pugx.org/tucker-eric/eloquentfilter/d/daily)](https://packagist.org/packages/tucker-eric/eloquentfilter)
 [![License](https://poser.pugx.org/tucker-eric/eloquentfilter/license)](https://packagist.org/packages/tucker-eric/eloquentfilter)
 [![StyleCI](https://styleci.io/repos/53163405/shield)](https://styleci.io/repos/53163405/)
-[![Build Status](https://travis-ci.org/Tucker-Eric/EloquentFilter.svg?branch=master)](https://travis-ci.org/Tucker-Eric/EloquentFilter)
 [![PHPUnit Status](https://github.com/Tucker-Eric/EloquentFilter/workflows/PHPUnit/badge.svg?branch=master)](https://github.com/Tucker-Eric/EloquentFilter/actions?query=branch%3Amaster)
 
 An Eloquent way to filter Eloquent Models and their relationships
@@ -347,8 +346,11 @@ The `Filterable` trait also comes with the below query builder helper methods:
 |EloquentFilter Method|QueryBuilder Equivalent|
 |---|---|
 |`$this->whereLike($column, $string)`|`$query->where($column, 'LIKE', '%'.$string.'%')`|
+|`$this->whereLike($column, $string, 'or')`|`$query->orWhere($column, 'LIKE', '%'.$string.'%')`|
 |`$this->whereBeginsWith($column, $string)`|`$query->where($column, 'LIKE', $string.'%')`|
+|`$this->whereBeginsWith($column, $string, 'or')`|`$query->orWhere($column, 'LIKE', $string.'%')`|
 |`$this->whereEndsWith($column, $string)`|`$query->where($column, 'LIKE', '%'.$string)`|
+|`$this->whereEndsWith($column, $string, 'or')`|`$query->orWhere($column, 'LIKE', '%'.$string)`|
 
 Since these methods are part of the `Filterable` trait they are accessible from any model that implements the trait without the need to call in the Model's EloquentFilter.
 

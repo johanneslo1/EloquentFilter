@@ -4,7 +4,6 @@ namespace EloquentFilter;
 
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 /**
@@ -30,12 +29,14 @@ abstract class ModelFilter
 
     /**
      * Container for all relations (local and related ModelFilters).
+     *
      * @var array
      */
     protected $allRelations = [];
 
     /**
      * Array of method names that should not be called.
+     *
      * @var array
      */
     protected $blacklist = [];
@@ -86,8 +87,8 @@ abstract class ModelFilter
      * ModelFilter constructor.
      *
      * @param $query
-     * @param array $input
-     * @param bool $relationsEnabled
+     * @param  array  $input
+     * @param  bool  $relationsEnabled
      */
     public function __construct($query, array $input = [], $relationsEnabled = true)
     {
@@ -114,7 +115,7 @@ abstract class ModelFilter
     /**
      * Remove empty strings from the input array.
      *
-     * @param array $input
+     * @param  array  $input
      * @return array
      */
     public function removeEmptyInput($input)
@@ -154,7 +155,7 @@ abstract class ModelFilter
      * Locally defines a relation filter method that will be called in the context of the related model.
      *
      * @param $relation
-     * @param \Closure $closure
+     * @param  \Closure  $closure
      * @return $this
      */
     public function addRelated($relation, \Closure $closure)
@@ -169,9 +170,9 @@ abstract class ModelFilter
      *
      * @param $relation
      * @param $column
-     * @param null $operator
-     * @param null $value
-     * @param string $boolean
+     * @param  string|null  $operator
+     * @param  string|null  $value
+     * @param  string  $boolean
      * @return $this
      */
     public function related($relation, $column, $operator = null, $value = null, $boolean = 'and')
@@ -245,6 +246,7 @@ abstract class ModelFilter
 
     /**
      * Returns all local relations and relations requiring other Model's Filter's.
+     *
      * @return array
      */
     public function getAllRelations()
@@ -263,7 +265,7 @@ abstract class ModelFilter
     /**
      * Get all input to pass through related filters and local closures as an array.
      *
-     * @param string $relation
+     * @param  string  $relation
      * @return array
      */
     public function getRelationConstraints($relation)
@@ -435,8 +437,14 @@ abstract class ModelFilter
             foreach ((array) $this->relations[$related] as $alias => $name) {
                 // If the alias is a string that is what we grab from the input
                 // Then use the name for the output so we can alias relations
-                if ($value = Arr::get($this->input, is_string($alias) ? $alias : $name)) {
-                    $output[$name] = $value;
+                $keyName = is_string($alias) ? $alias : $name;
+
+                if (array_key_exists($keyName, $this->input)) {
+                    $keyValue = $this->input[$keyName];
+
+                    if ($this->includeFilterInput($keyName, $keyValue)) {
+                        $output[$name] = $keyValue;
+                    }
                 }
             }
         }
@@ -478,7 +486,7 @@ abstract class ModelFilter
     }
 
     /**
-     * @param string $related
+     * @param  string  $related
      * @return array
      */
     public function getLocalRelation($related)
@@ -489,8 +497,8 @@ abstract class ModelFilter
     /**
      * Retrieve input by key or all input as array.
      *
-     * @param null $key
-     * @param null $default
+     * @param  string|null  $key
+     * @param  mixed|null  $default
      * @return array|mixed|null
      */
     public function input($key = null, $default = null)
@@ -541,7 +549,7 @@ abstract class ModelFilter
      * Will ONLY filter relations if called on additional method.
      *
      * @param $key
-     * @param null $value
+     * @param  null  $value
      */
     public function push($key, $value = null)
     {
@@ -555,8 +563,7 @@ abstract class ModelFilter
     /**
      * Set to drop `_id` from input. Mainly for testing.
      *
-     * @param null $bool
-     *
+     * @param  null  $bool
      * @return bool
      */
     public function dropIdSuffix($bool = null)
@@ -571,8 +578,7 @@ abstract class ModelFilter
     /**
      * Convert input to camel_case. Mainly for testing.
      *
-     * @param null $bool
-     *
+     * @param  null  $bool
      * @return bool
      */
     public function convertToCamelCasedMethods($bool = null)
@@ -586,7 +592,8 @@ abstract class ModelFilter
 
     /**
      * Add method to the blacklist so disable calling it.
-     * @param string $method
+     *
+     * @param  string  $method
      * @return $this
      */
     public function blacklistMethod($method)
@@ -598,7 +605,8 @@ abstract class ModelFilter
 
     /**
      * Remove a method from the blacklist.
-     * @param string $method
+     *
+     * @param  string  $method
      * @return $this
      */
     public function whitelistMethod($method)
@@ -621,6 +629,7 @@ abstract class ModelFilter
 
     /**
      * Check if the method is not blacklisted and callable on the extended class.
+     *
      * @param $method
      * @return bool
      */
@@ -634,8 +643,9 @@ abstract class ModelFilter
     /**
      * Method to determine if input should be passed to the filter
      * Returning false will exclude the input from being used in filter logic.
-     * @param mixed $value
-     * @param string $key
+     *
+     * @param  mixed  $value
+     * @param  string  $key
      * @return bool
      */
     protected function includeFilterInput($key, $value)

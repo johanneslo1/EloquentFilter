@@ -25,13 +25,13 @@ class ModelFilterChildTest extends TestCase
      */
     protected $db;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->model = new User;
         $this->dbSetup();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
@@ -97,7 +97,7 @@ class ModelFilterChildTest extends TestCase
 
     protected function dbSetup()
     {
-        $config = [
+        $config = collect([
             'database.fetch'       => PDO::FETCH_CLASS,
             'database.default'     => 'sqlite',
             'database.connections' => [
@@ -107,7 +107,7 @@ class ModelFilterChildTest extends TestCase
                     'prefix'   => '',
                 ],
             ],
-        ];
+        ]);
         $container = m::mock(\Illuminate\Container\Container::class);
         $container->shouldReceive('bound')->andReturn(false);
         $container->shouldReceive('offsetGet')->with('config')->andReturn($config);
