@@ -42,6 +42,13 @@ abstract class ModelFilter
     protected $blacklist = [];
 
     /**
+     * Filter out empty input so filter methods won't be called with empty values (strings, arrays, null).
+     *
+     * @var bool
+     */
+    protected $allowedEmptyFilters = false;
+
+    /**
      * Array of input to filter.
      *
      * @var array
@@ -86,21 +93,22 @@ abstract class ModelFilter
     /**
      * ModelFilter constructor.
      *
-     * @param $query
+     * @param  $query
      * @param  array  $input
      * @param  bool  $relationsEnabled
      */
     public function __construct($query, array $input = [], $relationsEnabled = true)
     {
         $this->query = $query;
-        $this->input = $this->removeEmptyInput($input);
+        $this->input = $this->allowedEmptyFilters ? $input : $this->removeEmptyInput($input);
         $this->relationsEnabled = $relationsEnabled;
+
         $this->registerMacros();
     }
 
     /**
-     * @param $method
-     * @param $args
+     * @param  $method
+     * @param  $args
      * @return mixed
      */
     public function __call($method, $args)
@@ -154,7 +162,7 @@ abstract class ModelFilter
     /**
      * Locally defines a relation filter method that will be called in the context of the related model.
      *
-     * @param $relation
+     * @param  $relation
      * @param  \Closure  $closure
      * @return $this
      */
@@ -168,8 +176,8 @@ abstract class ModelFilter
     /**
      * Add a where constraint to a relationship.
      *
-     * @param $relation
-     * @param $column
+     * @param  $relation
+     * @param  $column
      * @param  string|null  $operator
      * @param  string|null  $value
      * @param  string  $boolean
@@ -193,7 +201,7 @@ abstract class ModelFilter
     }
 
     /**
-     * @param $key
+     * @param  $key
      * @return string
      */
     public function getFilterMethod($key)
@@ -276,8 +284,8 @@ abstract class ModelFilter
     /**
      * Call setup method for relation before filtering on it.
      *
-     * @param $related
-     * @param $query
+     * @param  $related
+     * @param  $query
      */
     public function callRelatedLocalSetup($related, $query)
     {
@@ -289,7 +297,7 @@ abstract class ModelFilter
     /**
      * Run the filter on models that already have their tables joined.
      *
-     * @param $related
+     * @param  $related
      */
     public function filterJoinedRelation($related)
     {
@@ -333,7 +341,7 @@ abstract class ModelFilter
     /**
      * Checks if the relation to filter's table is already joined.
      *
-     * @param $relation
+     * @param  $relation
      * @return bool
      */
     public function relationIsJoined($relation)
@@ -348,7 +356,7 @@ abstract class ModelFilter
     /**
      * Get an empty instance of a related model.
      *
-     * @param $relation
+     * @param  $relation
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function getRelatedModel($relation)
@@ -361,7 +369,7 @@ abstract class ModelFilter
     }
 
     /**
-     * @param $relationString
+     * @param  $relationString
      * @return QueryBuilder|\Illuminate\Database\Eloquent\Model
      */
     protected function getNestedRelatedModel($relationString)
@@ -380,7 +388,7 @@ abstract class ModelFilter
     /**
      * Get the table name from a relationship.
      *
-     * @param $relation
+     * @param  $relation
      * @return string
      */
     public function getRelatedTable($relation)
@@ -391,7 +399,7 @@ abstract class ModelFilter
     /**
      * Get the model filter of a related model.
      *
-     * @param $relation
+     * @param  $relation
      * @return mixed
      */
     public function getRelatedFilter($relation)
@@ -402,7 +410,7 @@ abstract class ModelFilter
     /**
      * Filters by a relationship that isn't joined by using that relation's ModelFilter.
      *
-     * @param $related
+     * @param  $related
      */
     public function filterUnjoinedRelation($related)
     {
@@ -426,7 +434,7 @@ abstract class ModelFilter
     /**
      * Get input to pass to a related Model's Filter.
      *
-     * @param $related
+     * @param  $related
      * @return array
      */
     public function getRelatedFilterInput($related)
@@ -455,7 +463,7 @@ abstract class ModelFilter
     /**
      * Check to see if there is input or locally defined methods for the given relation.
      *
-     * @param $relation
+     * @param  $relation
      * @return bool
      */
     public function relationIsFilterable($relation)
@@ -466,7 +474,7 @@ abstract class ModelFilter
     /**
      * Checks if there is input that should be passed to a related Model Filter.
      *
-     * @param $related
+     * @param  $related
      * @return bool
      */
     public function relationUsesFilter($related)
@@ -477,7 +485,7 @@ abstract class ModelFilter
     /**
      * Checks to see if there are locally defined relations to filter.
      *
-     * @param $related
+     * @param  $related
      * @return bool
      */
     public function relationIsLocal($related)
@@ -548,7 +556,7 @@ abstract class ModelFilter
      * Add values to filter by if called in setup().
      * Will ONLY filter relations if called on additional method.
      *
-     * @param $key
+     * @param  $key
      * @param  null  $value
      */
     public function push($key, $value = null)
@@ -619,7 +627,7 @@ abstract class ModelFilter
     }
 
     /**
-     * @param $method
+     * @param  $method
      * @return bool
      */
     public function methodIsBlacklisted($method)
@@ -630,7 +638,7 @@ abstract class ModelFilter
     /**
      * Check if the method is not blacklisted and callable on the extended class.
      *
-     * @param $method
+     * @param  $method
      * @return bool
      */
     public function methodIsCallable($method)

@@ -244,10 +244,11 @@ This would create `app/ModelFilters/AdminFilters/UserFilter.php`
 ### Defining The Filter Logic
 Define the filter logic based on the camel cased input key passed to the `filter()` method.
 
-- Empty strings and null values are ignored
+- Empty strings and null values are ignored by default.
+  - Empty strings and values can be configured not to be ignored by setting `protected $allowedEmptyFilters = false;` on a filter.
 - If a `setup()` method is defined it will be called once before any filter methods regardless of input
 - `_id` is dropped from the end of the input key to define the method so filtering `user_id` would use the `user()` method
-    - (can be changed with by definining `protected $drop_id = false;` on a filter)
+    - Can be changed with by definining `protected $drop_id = false;` on a filter
 - Input without a corresponding filter method are ignored
 - The value of the key is injected into the method
 - All values are accessible through the `$this->input()` method or a single value by key `$this->input($key)`
@@ -577,7 +578,7 @@ If the following array is passed to the `filter()` method:
 ```php
 [
     'name'             => 'er',
-    'last_name'        => ''
+    'last_name'        => '',
     'company_id'       => 2,
     'roles'            => [1,4,7],
     'industry'         => 5,
@@ -639,7 +640,7 @@ class UserFilter extends ModelFilter
 ##### Adding Relation Values To Filter
 
 Sometimes, based on the value of a parameter you may need to push data to a relation filter.  The `push()` method does just this.
-It accepts one argument as an array of key value pairs or to arguments as a key value pair `push($key, $value)`.
+It accepts one argument as an array of key value pairs or two arguments as a key value pair `push($key, $value)`.
 Related models are filtered AFTER all local values have been executed you can use this method in any filter method.
 This avoids having to query a related table more than once.  For Example:
 
@@ -692,8 +693,8 @@ OR:
 }
 ```
 
-In your view `$users->render()` will return pagination links as it normally would but with the original query string with empty input ignored.
+In your view `$users->render()` will return pagination links as it normally would but with the original query string with empty input ignored if `protected $allowedEmptyFilters` is not set to `false` on the filter.
 
 
 # Contributing
-Any contributions welcome!
+Any contributions are welcome!

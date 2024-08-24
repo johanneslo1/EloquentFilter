@@ -60,13 +60,13 @@ class ModelFilterTest extends TestCase
         // Test with inserting array
         $this->filter->push([
             'company_id' => '2',
-            'roles'      => ['1', '4', '7'],
+            'roles' => ['1', '4', '7'],
         ]);
 
         $this->assertEquals($this->filter->input(), [
-            'name'       => 'er',
+            'name' => 'er',
             'company_id' => '2',
-            'roles'      => ['1', '4', '7'],
+            'roles' => ['1', '4', '7'],
         ]);
     }
 
@@ -113,12 +113,12 @@ class ModelFilterTest extends TestCase
     public function testGetFilterMethod()
     {
         $input = [
-            'name'               => 'name',
-            'first_name'         => 'firstName',
+            'name' => 'name',
+            'first_name' => 'firstName',
             'first_or_last_name' => 'firstOrLastName',
             // Test dot-notation works
-            'Company.Name'       => 'companyName',
-            'Company-Name'       => 'companyName',
+            'Company.Name' => 'companyName',
+            'Company-Name' => 'companyName',
         ];
 
         foreach ($input as $key => $method) {
@@ -286,6 +286,27 @@ class ModelFilterTest extends TestCase
         $this->assertTrue($this->filter->methodIsBlacklisted($method));
         $this->filter->whitelistMethod($method);
         $this->assertFalse($this->filter->methodIsBlacklisted($method));
+    }
+
+    public function testAllowedEmptyFilter()
+    {
+        $emptyInput = [
+            'empty_array' => [],
+            'null_value' => null,
+            'empty_string' => '',
+        ];
+
+        $filter = new class($this->builder, $emptyInput) extends ModelFilter
+        {
+            protected $allowedEmptyFilters = true;
+        };
+
+        $this->assertEquals($filter->input(), $emptyInput);
+
+        $filter = new class($this->builder, $emptyInput) extends ModelFilter {
+        };
+
+        $this->assertEquals($filter->input(), []);
     }
 
     public function testParentClassMethodsCantBeCalledByInput()
