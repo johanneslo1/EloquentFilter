@@ -129,7 +129,7 @@ class MakeEloquentFilter extends Command
      */
     public function makeClassName()
     {
-        $parts = array_map([Str::class, 'studly'], explode('\\', $this->argument('name')));
+        $parts = array_map([Str::class, 'studly'], explode('\\', str_replace('/', '\\', $this->argument('name'))));
         $className = array_pop($parts);
         $ns = count($parts) > 0 ? implode('\\', $parts).'\\' : '';
 
